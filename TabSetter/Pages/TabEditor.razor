@@ -1,0 +1,77 @@
+﻿@page "/tab-editor/{FormId:int}"
+@page "/tab-preview/{FormId:int}"
+@*@inject IJSRuntime jsruntime*@
+
+@*@inject IFormService formService*@
+@*@inject NavigationManager NavigationManager*@
+
+<h2 class="text-center">@Heading</h2>
+
+@if (IsProcessing)
+{
+    <div style="position:fixed;top:50%;left:50%;margin-top:-50px;margin-left:-100px;">
+        <img src="images/ajax-loader.gif" />
+    </div>
+}
+else
+{
+    <form>
+        @foreach (var fieldInfo in Fields)
+        {
+            <div class="form-group row">
+                @if (Mode == PageMode.TabEdit)
+                {
+                    <div class="col-sm-1">
+                        <TabIndexButton InputId="fieldInfo.InputId" Required="fieldInfo.Required" @bind-TabCount="TabCount" TabIndexChanged="UpdateTabIndex" TabIndex="fieldInfo.TabIndex"></TabIndexButton>
+                    </div>
+                }
+
+                @if (fieldInfo.DataType == InputType.Text)
+                {
+                    <label class="col-sm-2">@fieldInfo.Name:</label>
+                    <div class="col-sm-9">
+                        <input id="input-@fieldInfo.InputId" type="text" placeholder="@fieldInfo.Placeholder" class="form-control" tabindex="@fieldInfo.TabIndex" />
+                    </div>
+                }
+                else if (fieldInfo.DataType == InputType.Date)
+                {
+                    <label class="col-sm-2">@fieldInfo.Name:</label>
+                    <div class="col-sm-9">
+                        <input id="input-@fieldInfo.InputId" type="datetime" placeholder="@fieldInfo.Placeholder" class="form-control" tabindex="@fieldInfo.TabIndex" />
+                    </div>
+                }
+                else if (fieldInfo.DataType == InputType.Currency)
+                {
+                    <label class="col-sm-2">@fieldInfo.Name:</label>
+                    <div class="col-sm-9">
+                        <input id="input-@fieldInfo.InputId" type="number" placeholder="@fieldInfo.Placeholder" class="form-control" tabindex="@fieldInfo.TabIndex" />
+                    </div>
+                }
+            </div>
+        }
+    </form>
+
+    @if (Mode == PageMode.TabEdit && Invalid)
+    {
+        <div class="alert alert-danger" role="alert">
+            Fields next to red buttons must have tab index set.
+        </div>
+    }
+
+    <div class="row justify-content-center">
+        @if (Mode == PageMode.TabEdit)
+        {
+            <button type="button" class="btn btn-primary m-2" @onclick="SaveTabs">Save Tab Order&nbsp;<i class="fas fa-save"></i></button>
+            <button class="btn btn-secondary m-2" @onclick="ResetTabs">Reset Tab Order To Default</button>
+        }
+        @if (Mode == PageMode.TabPreview)
+        {
+            <button class="btn btn-success m-2" @onclick="EditTabs">Edit Tab Order&nbsp;<i class="fas fa-edit"></i></button>
+        }
+        @if (Mode == PageMode.TabEdit)
+        {
+            <button class="btn btn-danger m-2" @onclick="ClearTabs">Clear Tab Settings&nbsp;<i class="fas fa-eraser"></i></button>
+        }
+
+    </div>
+}

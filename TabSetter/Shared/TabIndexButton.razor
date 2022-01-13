@@ -1,0 +1,36 @@
+﻿<button type="button" class="btn @ButtonClass @Class" @onclick="SetTabIndex">@TabIndexDisplay</button>
+
+@code {
+    [Parameter]
+    public bool Required { get; set; }
+
+    [Parameter]
+    public int InputId { get; set; }
+
+    [Parameter]
+    public string Class { get; set; }
+
+    [Parameter]
+    public int TabCount { get; set; }
+
+    [Parameter]
+    public EventCallback<int> TabCountChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<TabUpdate> TabIndexChanged { get; set; }
+
+    [Parameter]
+    public int? TabIndex { get; set; }
+
+    public string TabIndexDisplay => TabIndex == null ? "-" : TabIndex.GetValueOrDefault().ToString();
+
+    public string ButtonClass => Required ? "btn-danger" : "btn-secondary";
+
+    public async Task SetTabIndex()
+    {
+        TabCount++;
+        TabIndex = TabCount;
+        await TabIndexChanged.InvokeAsync(new TabUpdate(InputId, TabIndex.GetValueOrDefault()));
+        await TabCountChanged.InvokeAsync(TabCount);
+    }
+}
